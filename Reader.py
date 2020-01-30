@@ -136,7 +136,8 @@ class Reader():
             tmp["path"] = self.config["samples"][sample]["name"] 
             tmp["histname"   ] = sample
             tmp["rename"      ] = {}
-
+            tmp["tree_name"   ] = self.config["tree_name_prefix"]
+            
             self.itersamples.append( tmp )
 
         return self
@@ -159,6 +160,7 @@ class Reader():
                 tmp = self._getCommonSettings(sample)
                 tmp["path"] = self.config["samples"][sample]["name"] 
                 tmp["histname"   ] = sample
+                tmp["tree_name"   ] = self.config["tree_name_prefix"]
                 tmp["rename"      ] = {}
                 self.itersamples.append( tmp )
 
@@ -170,8 +172,9 @@ class Reader():
                         if "EMB" in sample and ("em" not in self.channel or ("em" in self.channel and not "escale" in shapename)) :  continue
                         tmp = self._getCommonSettings(sample)
 
+                        tmp["tree_name"] = self.config["tree_name_prefix"] + "_" + shape
                         tmp["path"] = self.config["samples"][sample]["shapes"][shape] 
-                        tmp["histname"   ] = sample.replace("full",shape)
+                        tmp["histname"   ] = sample
                         tmp["rename"      ] = self._getRenaming( shape )
 
                         self.itersamples.append( tmp )                
@@ -210,7 +213,8 @@ class Reader():
             
         print "\033[1;32mLoading:\033[0m ", constStrLen( sample_info["histname"] ) , sample_info["path"].split("/")[-1]
         DF = self._getDF(sample_path = sample_info["path"], 
-                          select = sample_info["select"])
+                          select = sample_info["select"],
+                          tree_name = sample_info["tree_name"])
 
         # A bit hacky. Return  iterator when predicting to reduce memory consumption
         # Otherweise split in folds
@@ -351,7 +355,7 @@ class Reader():
         if self.folds != 2: raise NotImplementedError("Only implemented two folds so far!!!")
         return [df.query( "abs(evt % 2) != 0 " ).reset_index(drop=True), df.query( "abs(evt % 2) == 0 " ).reset_index(drop=True) ]
 
-    def _getDF( self, sample_path, select ):
+    def _getDF( self, sample_path, select, tree_name):
 
         add = "addvar"
         if "Embedd" in sample_path:
@@ -371,11 +375,15 @@ class Reader():
         if self.for_prediction:
             chunksize = 100000
 
-        tmp = rp.read_root( paths = sample_path,
-                            where = select,
-                            columns = branches,
-                            chunksize = chunksize)
-
+        try:
+            tmp = rp.read_root( paths = sample_path,
+                                key = tree_name,
+                                where = select,
+                                columns = branches,
+                                chunksize = chunksize)
+        except OSError as e:
+            print('\n', e, '\nSkipping this tree\n') 
+            return
 
         # tmp.replace(-999.,-10, inplace = True)
         # tmp["evt"] = tmp["evt"].astype('int64')

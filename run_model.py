@@ -116,6 +116,13 @@ def run(samples,channel, era, use, train,short, datacard = False, add_nominal=Fa
     if not datacard:
 
         outpath = read.config["outpath"] + "/predictions_" + era
+        if not os.path.exists(outpath):
+            os.mkdir(outpath)                
+        files = glob(outpath + '/*.root')
+        print(f'\nDeleting root files in {outpath}\n')
+        for f in files:
+            os.remove(f)
+            
         predictions = {}
         print "Predicting samples"
         if add_nominal:
@@ -163,6 +170,10 @@ def sandbox(channel, model, scaler, sample, variables, outname, outpath, config 
     # needed because of memory management
     # iterate over chunks of sample and do splitting on the fly
     first = True
+    if sample is None:
+        print "\nSandbox for sample: ", config["histname"], " and tree: ", {config["tree_name"]}, "is None. Skipping.\n"
+        return
+        
     for part in sample:
         # This is awful. Try to figure out a better way to add stuff to generator.
         if modify:
@@ -171,7 +182,7 @@ def sandbox(channel, model, scaler, sample, variables, outname, outpath, config 
         part["THU"] = 1 # Add dummy
         # Carefull!! Check if splitting is done the same for training. This is the KIT splitting
         folds = [part.query( "abs(evt % 2) != 0 " ).reset_index(drop=True), part.query( "abs(evt % 2) == 0 " ).reset_index(drop=True) ]
-        addPrediction(channel, model.predict( applyScaler(scaler, folds, variables) ), folds, outname, outpath, new = first )
+        addPrediction(channel, model.predict( applyScaler(scaler, folds, variables) ), folds, outname, config['tree_name'], outpath, new = first )
         
         folds[0].drop(folds[0].index, inplace=True)
         folds[1].drop(folds[1].index, inplace=True)
@@ -180,19 +191,22 @@ def sandbox(channel, model, scaler, sample, variables, outname, outpath, config 
         first = False
     del sample
 
-def addPrediction(channel,prediction, df, sample, outpath, new = True):
+def addPrediction(channel,prediction, df, sample, tree_name, outpath, new = True):
 
     if not os.path.exists(outpath):
         os.mkdir(outpath)
 
+    outfile_name = "{0}/{1}-{2}.root".format(outpath, channel, sample)
+    
     for i in xrange( len(df) ):
         for c in prediction[i].columns.values.tolist():
             df[i][c] =  prediction[i][c]
             
-        if i == 0 and new: mode = "w"
-        else: mode = "a"
+        # if i == 0 and new: mode = "w"
+        # else: mode = "a"
         # df[i].to_root("{0}/{1}-{2}.root".format("predictions",channel, sample), key="TauCheck", mode = mode)
-        df[i].to_root("{0}/{1}-{2}.root".format(outpath,channel, sample), key="TauCheck", mode = mode)
+        # df[i].to_root("{0}/{1}-{2}.root".format(outpath,channel, sample), key="TauCheck", mode = mode)
+        df[i].to_root(outfile_name, key=tree_name, mode = 'a')
         prediction[i].drop(prediction[i].index, inplace = True)
 
 def trainScaler(folds, variables):

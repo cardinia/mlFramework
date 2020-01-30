@@ -1,6 +1,7 @@
 {
     "path": "/nfs/dust/cms/user/cardinia/HtoTauTau/HiggsCP/DNN/CMSSW_10_2_16/src/HiggsCP/Inputs/NTuples_mt_2018", 
     "outpath": "/nfs/dust/cms/user/cardinia/HtoTauTau/HiggsCP/DNN/CMSSW_10_2_16/src/HiggsCP/Outputs/NTuples_mt_2018",
+    "tree_name_prefix":"TauCheck",
     "variables":{
         "mt": [
             "pt_2",
@@ -42,8 +43,7 @@
 
     "weights":["*weight*","gen_match*","topptweight*","zptweight", "trigweight*","njets","jpt_1","jdeta","mjj","gen_sm_htt125","gen_ps_htt125","gen_mm_htt125"],
     "shape_from_file":["TES1p0p0","TES1p1p0","TES3p0p0","MES1p0p0","MES1p1p0"],
-    "shape_from_tree":["Total","CMS_scale_j_eta0to5_13TeV","CMS_scale_j_eta0to3_13TeV","CMS_scale_j_eta3to5_13TeV","CMS_scale_j_RelativeBal_13TeV","CMS_scale_j_RelativeSample_13TeV",
-                       "Btag","Mistag","CMS_htt_boson_reso_met_13TeV","CMS_htt_boson_scale_met_13TeV"
+    "shape_from_tree":["CMS_scale_j_JES13TeV"
     ],
 
     "samples":{
