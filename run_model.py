@@ -84,10 +84,16 @@ def run(samples,channel, era, use, train,short, datacard = False, add_nominal=Fa
         scaler = [scaler, scaler] # Hotfix since KIT uses 2 scalers
 
         trainSet = applyScaler(scaler, trainSet, variables)
+        
+        for i, train_df in enumerate(trainSet):
+            if np.sum(train_df.isna()).sum() != 0:
+                print "\ntrainSet[{}] has {} NaNs in columns: {}".format(i, np.sum(train_df.isna()).sum(), train_df.columns[(np.sum(train_df.isna())) != 0].values)
+                print "will drop them\n"
+                train_df.dropna(inplace=True)
 
         model = modelObject( parameter_file = parameters,
                              variables=variables,
-                             target_names = target_names )
+                             target_names = target_names )                             
         model.train( trainSet )
         model.save(modelname)
 
