@@ -1,8 +1,8 @@
 {
-	"-SS-":"q_1 * q_2 > 0",
-	"-OS-":"q_1 * q_2 < 0",
+	"-SS-":"os < 0.5",
+	"-OS-":"os > 0.5",
 	"-VETO-":{
-		"mt":"((extramuon_veto < 0.5) & (extraelec_veto < 0.5) & (dilepton_veto<0.5) & (byVLooseDeepTau2017v2p1VSmu_2>0.5) & (byVVVLooseDeepTau2017v2p1VSe_2>0.5) )",
+		"mt":"1",
 		"et":"((extramuon_veto < 0.5) & (extraelec_veto < 0.5) & (dilepton_veto<0.5) & (byVVVLooseDeepTau2017v2p1VSmu_2>0.5) & (byVLoosetDeepTau2017v2p1VSe_2>0.5) )",
 		"tt":"((extramuon_veto < 0.5) & (extraelec_veto < 0.5) & (dilepton_veto<0.5) & (byVLooseDeepTau2017v2p1VSmu_1>0.5) & (byVVVLooseDeepTau2017v2p1VSe_1>0.5) & (byVLooseDeepTau2017v2p1VSmu_2>0.5) & (byVLooseDeepTau2017v2p1VSe_2>0.5) )",
 		"em":"((extramuon_veto < 0.5) & (extraelec_veto < 0.5) & metFilters)"
@@ -44,7 +44,7 @@
 		"em":"(iso_1<0.50 & iso_2>0.2 & iso_2<0.5)"
 	},
 	"-TRIG-":{
-		"mt":"( ( (trg_mutaucross & abs(eta_1) < 2.1 & pt_1 < 25) | trg_singlemuon  ) & pt_2 > 30 )",
+		"mt":"1",
 		"et":"( ( (trg_crossele_ele24tau30 && pt_1 < 28) | trg_singleelectron_27 | trg_singleelectron_32 | trg_singleelectron_35 ) & pt_2 > 30 )",
 		"tt":"( trg_doubletau_40_tightiso | trg_doubletau_40_mediso_tightid | trg_doubletau_35_tightiso_tightid )",
 		"em":"(trg_muonelectron & pt_1 > 13 & pt_2 > 10 & TMath::Max(pt_1,pt_2)>24)"

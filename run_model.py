@@ -119,8 +119,8 @@ def run(samples,channel, era, use, train,short, datacard = False, add_nominal=Fa
         if not os.path.exists(outpath):
             os.mkdir(outpath)                
         files = glob(outpath + '/*.root')
-        print(f'\nDeleting root files in {outpath}\n')
         for f in files:
+            print "\nDeleting root files in " + outpath + "\n"
             os.remove(f)
             
         predictions = {}
